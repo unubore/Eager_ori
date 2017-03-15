@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="core.tysysusr">
+
+	<resultMap id="tysysusrMap" type="com.eager.core.domain.Tysysusr">
+		<id property="id" column="ID" />
+		<result property="username" column="USERNAME" />
+		<result property="password" column="PASSWORD" />
+		<result property="name" column="NAME" />
+		<result property="phonenumber" column="PHONENUMBER" />
+		<result property="email" column="EMAIL" />
+		<result property="isAdmin" column="ISADMIN" />
+		<result property="isLocked" column="ISLOCKED" />
+		<result property="group.id" column="GROUPID" />
+		<result property="remark" column="REMARK" />
+		<result property="failureTimes" column="FAILURETIMES" />
+		<result property="validPeriod" column="VALIDPERIOD" />
+		<result property="previousLoginIp" column="PREVIOUSLOGINIP" />
+		<result property="previousLoginTime" column="PREVIOUSLOGINTIME" />
+		<result property="lastLoginIp" column="LASTLOGINIP" />
+		<result property="lastLoginTime" column="LASTLOGINTIME" />
+		<result property="dataSource" column="DATASOURCE" />
+
+	</resultMap>
+	<select id="login" resultMap="tysysusrMap">
+		select * from tysysusr
+		where
+		username= #{username} and password=#{password}
+	</select>
+	<select id="findAllTysysusrs" parameterType="com.eager.core.domain.vo.TysysusrVo"
+		resultMap="tysysusrMap">
+		select * from tysysusr
+		<where>
+			isadmin = 0
+			<if test="name!=null and name!=''">
+				and name like '%'||#{name}||'%'
+			</if>
+		</where>
+	</select>
+	<select id="getTysysusrById" resultMap="tysysusrMap">
+		select * from tysysusr
+		where
+		id = #{value}
+	</select>
+	<insert id="addTysysusr">
+		<selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+			select nextVal('tb_tysysusr') as id
+		</selectKey>
+		insert into tysysusr (id
+		,username
+		,password
+		,isadmin
+		<if test="name!=null and name!=''">
+			,name
+		</if>
+		<if test="phonenumber!=null and phonenumber!=''">
+			,phonenumber
+		</if>
+		<if test="email!=null and email!=''">
+			,email
+		</if>
+		<if test="group!=null and group.id!=null">
+			,groupid
+		</if>
+		<if test="remark!=null and remark!=''">
+			,remark
+		</if>
+		<if test="dataSource!=null and dataSource!=''">
+			,dataSource
+		</if>
+		,createdate,createuser)
+		values
+		(#{id},#{username},#{password},0
+		<if test="name!=null and name!=''">
+			,#{name}
+		</if>
+		<if test="phonenumber!=null and phonenumber!=''">
+			,#{phonenumber}
+		</if>
+		<if test="email!=null and email!=''">
+			,#{email}
+		</if>
+		<if test="group!=null and group.id!=null">
+			,#{group.id}
+		</if>
+		<if test="remark!=null and remark!=''">
+			,#{remark}
+		</if>
+		<if test="dataSource!=null and dataSource!=''">
+			,#{dataSource}
+		</if>
+		,current_timestamp(0)::timestamp without time zone
+		,#{createUser})
+	</insert>
+	<update id="updateTysysusr">
+		update tysysusr
+		<set>
+			username=#{username},isadmin=0
+			<if test="name!=null and name!=''">
+				,name=#{name}
+			</if>
+			<if test="phonenumber!=null and phonenumber!=''">
+				,phonenumber=#{phonenumber}
+			</if>
+			<if test="email!=null and email!=''">
+				,email=#{email}
+			</if>
+			<if test="group!=null and group.id!=null">
+				,groupid=#{group.id}
+			</if>
+			<if test="remark!=null and remark!=''">
+				,remark=#{remark}
+			</if>
+			<if test="dataSource!=null and dataSource!=''">
+				,dataSource=#{dataSource}
+			</if>
+			,updatedate=current_timestamp(0)::timestamp without time zone
+			,updateuser=#{updateUser}
+		</set>
+		where id=#{id}
+	</update>
+	<delete id="deleteTysysusrById">
+		delete tysysusr where id=#{value}
+	</delete>
+	<select id="getTysysusrByUsername" resultMap="tysysusrMap">
+		select * from
+		tysysusr where username = #{value}
+	</select>
+	<update id="updateFailureTimesById">
+		update tysysusr
+		<set>
+			failureTimes=#{failureTimes}
+		</set>
+		where id=#{id}
+	</update>
+	<update id="lockTysysusrByid">
+		update tysysusr
+		<set>
+			failureTimes=#{failureTimes}
+		</set>
+		where id=#{id}
+	</update>
+	<update id="updateTysysusrForLogin">
+		update tysysusr
+		<set>
+			previousLoginIp=lastLoginIp,
+			previousLoginTime=lastLoginTime,
+			lastLoginIp=#{lastLoginIp},
+			lastLoginTime=current_timestamp(0)::timestamp without time zone
+		</set>
+		where id=#{id}
+	</update>
+	<update id="setvalidPeriodById">
+		update tysysusr
+		<set>
+			validPeriod=COALESCE(validPeriod,current_date) +interval
+			#{validPeriod}
+		</set>
+		where id=#{id}
+	</update>
+</mapper> 

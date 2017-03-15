@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="core.tysysusrg">
+	<resultMap id="tysysusrgMap" type="com.eager.core.domain.Tysysusrg">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+	<select id="getTysysusrgByid" resultMap="tysysusrgMap">
+		select * from tysysusrg
+		where
+		id = #{id}
+	</select>
+</mapper> 

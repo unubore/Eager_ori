@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+    "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<!-- 该属性指定需要Struts 2处理的请求后缀，该属性的默认值是action，即所有匹配*.action的请求都由Struts 2处理。 
+		如果用户需要指定多个请求后缀，则多个后缀之间以英文逗号（，）隔开。 -->
+	<constant name="struts.action.extension" value="action" />
+	<!-- 编码格式 -->
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<!-- 浏览器是否缓存静态内容 -->
+	<constant name="struts.serve.static.browserCache" value="false" />
+
+	<!-- 把它设置为开发模式，发布时要设置为false -->
+	<constant name="struts.devMode" value="true" />
+	<!-- 是否自动加载国际化资源文件 -->
+	<constant name="struts.i18n.reload" value="false" />
+	<!-- 是否自动重新加载XML配置文件 -->
+	<constant name="struts.configuration.xml.reload" value="true" />
+
+	<constant name="struts.objectFactory" value="spring" />
+	<!-- 设置ognl表达式是否支持静态方法 -->
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" />
+	<!-- 在URL中的Action段中是否支持斜线 -->
+	<constant name="struts.enable.SlashesInActionNames" value="ture" />
+	<!-- 设置上传的临时文件的最大限制 -->
+	<constant name="struts.multipart.maxSize" value="100000000000" />
+
+
+
+	<!-- 注解配置 -->
+	<constant name="struts.convention.result.path" value="" />
+	<constant name="struts.convention.default.parent.package"
+		value="defaultEager" />
+	<constant name="struts.convention.action.packages" value="com.eager" />
+	<constant name="struts.convention.package.locators" value="action" />
+	<constant name="struts.convention.action.suffix" value="Action" />
+	<constant name="struts.convention.action.disableJarScanning"
+		value="true" />
+	<constant name="struts.convention.action.fileProtocols" value="jar,code-source" />
+
+
+
+
+
+
+
+
+
+
+	<constant name="struts.objectFactory.spring.autoWire.alwaysRespect"
+		value="true" />
+
+
+	<package name="defaultEager" extends="json-default">
+		<result-types>
+			<result-type name="json" class="org.apache.struts2.json.JSONResult">
+				<param name="defaultEncoding">UTF-8</param>
+				<param name="ignoreHierarchy">false</param>
+				<param name="excludeNullProperties">true</param>
+			</result-type>
+		</result-types>
+		<interceptors>
+			<!-- 没用到 去掉 -->
+			<!-- <interceptor name="whiteListInterceptor" class="com.tianque.core.struts.interceptor.WhiteListInterceptor" 
+				/> -->
+			<!-- 仅登录判断已改造 -->
+			<!-- <interceptor name="firstLoginInterceptor" class="com.tianque.component.interceptor.FirstLoginInterceptor" 
+				/> -->
+			<!-- <interceptor name="permissionInterceptor" class="com.tianque.component.interceptor.PermissionInterceptor" 
+				/> -->
+			<!-- 去掉耗时记录，调试测试状态可以打开，或者通过第三方工具查看 -->
+			<!-- <interceptor name="timeCostInterceptor" class="com.tianque.core.struts.interceptor.TimeCostInterceptor" 
+				/> -->
+			<!-- 去掉耗时操作，调试测试状态可以打开，或者通过第三方工具查看 -->
+			<!-- <interceptor name="moduleClickStatisticsInterceptor" class="com.tianque.component.interceptor.ModuleClickStatisticsInterceptor" 
+				/> -->
+			<!-- <interceptor name="exceptionInterceptor" class="com.tianque.core.struts.interceptor.ExceptionInterceptor" 
+				/> -->
+			<!-- <interceptor name="formTokenInterceptor" class="com.tianque.core.struts.interceptor.FormTokenInterceptor" 
+				/> -->
+			<interceptor-stack name="eagerStack">
+				<!-- <interceptor-ref name="formTokenInterceptor"></interceptor-ref> -->
+				<!-- <interceptor-ref name="whiteListInterceptor"></interceptor-ref> -->
+				<!-- <interceptor-ref name="firstLoginInterceptor"></interceptor-ref> -->
+				<!-- <interceptor-ref name="permissionInterceptor"></interceptor-ref> -->
+				<interceptor-ref name="fileUpload"></interceptor-ref>
+				<!-- <interceptor-ref name="moduleClickStatisticsInterceptor"></interceptor-ref> -->
+				<interceptor-ref name="defaultStack" />
+				<!-- <interceptor-ref name="exceptionInterceptor" /> -->
+				<interceptor-ref name="logger" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="eagerStack" />
+		<global-results>
+			<result name="login">
+				/login.jsp
+			</result>
+			<!-- <result name="notHavePermissionResult">
+				/common/notHavePermissionResult.jsp
+			</result>
+			<result name="none">
+				/index.jsp
+			</result>
+			<result name="firstLogin">/sysadmin/userManage/firstUpdatePassword.jsp
+			</result>
+			<result name="all">/common/errorException.jsp</result>
+			<result name="mobile_error" type="json">
+				<param name="root">errorResponse</param>
+				<param name="ignoreHierarchy">false</param>
+			</result>
+			表单重复提交时错误提示
+			<result name="invalid.token" type="json">
+				<param name="root">"请不要重复提交！"</param>
+				<param name="ignoreHierarchy">false</param>
+			</result>
+			<result name="jmsError" type="json">
+				<param name="root">"请联系管理员部署jms服务"</param>
+				<param name="ignoreHierarchy">false</param>
+			</result>
+
+			<result name="streamSuccess" type="stream">
+				<param name="contentType">application/vnd.ms-excel;charset=ISO8859-1</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			<result name="error" type="json">
+				<param name="root">errorMessage</param>
+				<param name="ignoreHierarchy">false</param>
+			</result>
+			<result name="clientDownload" type="stream">
+				<param name="contentType">text/plain</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+				<param name="contentLength">${contentLength}</param>
+			</result>
+			<result name="exportData" type="stream">
+				<param name="contentType">application/octet-stream;charset=ISO8859-1</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			<result name="exportPdf" type="stream">
+				<param name="contentType">application/pdf</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			<result name="exportresultPDF" type="stream">
+				<param name="contentType">application/pdf</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			<result name="exportExcel" type="stream">
+				<param name="contentType">application/excel</param>
+				<param name="inputName">inputStream</param>
+				下载时候提示的文件名
+				<param name="contentDisposition">attachment;filename="${downloadFileName}"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			<result name="input">/500.jsp</result> -->
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping result="error" exception="java.lang.Exception"></exception-mapping>
+			<!-- <exception-mapping result="jmsError" exception="javax.jms.JMSException"></exception-mapping> -->
+		</global-exception-mappings>
+	</package>
+
+</struts>
+

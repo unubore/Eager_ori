@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="build.buildtables">
+
+	<resultMap id="columnsMap" type="com.eager.build.domain.Columns">
+		<result property="columnName" column="COLUMNNAME" />
+		<result property="comment" column="COMMENT" />
+		<result property="dataType" column="DATATYPE" />
+		<result property="dataLength" column="DATALENGTH" />
+		<result property="dataScale" column="DATASCALE" />
+		<result property="notNull" column="NOTNULL" />
+	</resultMap>
+	<resultMap id="tablesMap" type="com.eager.build.domain.Tables">
+		<result property="tableName" column="TABLENAME" />
+	</resultMap>
+	<select id="findAllTablesPostgresql" resultMap="tablesMap">
+		select tablename from pg_tables where schemaname=#{value}
+	</select>
+	<select id="findAllColumnsPostgresql" resultMap="columnsMap">
+		SELECT
+		col.column_name as columnName,
+		col.data_type as dataType,
+		coalesce(col.numeric_precision,col.character_maximum_length) as
+		dataLength,
+		col.numeric_scale as dataScale,
+		(case when col.is_nullable='NO' then 1 else 0 end) as notNull,
+		des.description as comment
+		FROM
+		information_schema.columns col LEFT JOIN pg_description des
+		ON col.table_name::regclass = des.objoid
+		AND col.ordinal_position = des.objsubid
+		WHERE
+		table_schema = #{schemaname}
+		and table_name = #{tablename}
+		and col.column_name not in
+		('id','createuser','createdate','updateuser','updatedate')
+		ORDER BY
+		ordinal_position
+	</select>
+	<select id="findSimpleTableColumnsPostgresql" resultType="java.lang.String">
+		SELECT
+		col.column_name 
+		FROM
+		information_schema.columns col 
+		WHERE
+		table_schema = #{schemaname}
+		and table_name = #{tablename}
+		and col.column_name not in
+		('id','createuser','createdate','updateuser','updatedate')
+		ORDER BY
+		ordinal_position
+	</select>
+	<select id="findTysysperByUrl" resultMap="simpletysysper">
+		select * from tysysper
+		where url=#{url}
+	</select>
+	<select id="findAllpermissionsToList" resultMap="simpletysysper">
+		select * from tysysper
+		where url=#{url}
+	</select>
+
+</mapper> 

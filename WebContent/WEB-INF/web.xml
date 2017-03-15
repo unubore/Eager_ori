@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+	<display-name></display-name>
+	<welcome-file-list>
+		<welcome-file>login.jsp</welcome-file>
+	</welcome-file-list>
+	<listener>
+		<listener-class>com.eager.core.listener.ContextLoaderListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:**/applicationContext.xml</param-value>
+	</context-param>
+
+	<!-- 主要负责处理由 JavaBeans Introspector的使用而引起的缓冲泄露 -->
+	<listener>
+		<listener-class>
+			org.springframework.web.util.IntrospectorCleanupListener
+		</listener-class>
+	</listener>
+
+	<!-- 将HttpRequest放入当前线程以便访问 -->
+	<listener>
+		<listener-class>
+			org.springframework.web.context.request.RequestContextListener
+		</listener-class>
+	</listener>
+	<filter>
+		<filter-name>LoginStatusValidateFilter</filter-name>
+		<filter-class>com.eager.core.filter.LoginStatusValidateFilter</filter-class>
+	</filter>
+	<filter>
+		<!-- 配置Struts 2核心Filter的名字 -->
+		<filter-name>struts</filter-name>
+		<!-- 配置Struts 2核心Filter的实现类 -->
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>ClearThreadVariable</filter-name>
+		<filter-class>com.eager.core.filter.ClearThreadVariable</filter-class>
+	</filter>
+	<filter>
+		<filter-name>jettyGzipFilter</filter-name>
+		<filter-class>org.mortbay.servlet.GzipFilter</filter-class>
+		<init-param>
+			<param-name>mimeTypes</param-name>
+			<param-value>text/javascript,application/x-javascript,text/html,text/css</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>EagerModuelFilter</filter-name>
+		<filter-class>com.eager.core.filter.EagerModuelFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>jettyGzipFilter</filter-name>
+		<url-pattern>*.js</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>jettyGzipFilter</filter-name>
+		<url-pattern>*.css</url-pattern>
+	</filter-mapping>
+	<!-- <filter-mapping> <filter-name>jettyGzipFilter</filter-name> <url-pattern>*.jsp</url-pattern> 
+		</filter-mapping> <filter-mapping> <filter-name>jettyGzipFilter</filter-name> 
+		<url-pattern>*.action</url-pattern> </filter-mapping> -->
+	
+
+	<!-- <filter-mapping> <filter-name>ParametersTrimFilter</filter-name> <url-pattern>/*</url-pattern> 
+		</filter-mapping> -->
+	<filter-mapping>
+		<filter-name>ClearThreadVariable</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- <filter-mapping> <filter-name>ParametersTrimFilter</filter-name> <url-pattern>/*</url-pattern> 
+		</filter-mapping> -->
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LoginStatusValidateFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- <filter-mapping> <filter-name>struts-cleanup</filter-name> <url-pattern>/*</url-pattern> 
+		</filter-mapping> -->
+	<filter-mapping>
+		<filter-name>struts</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>EagerModuelFilter</filter-name>
+		<url-pattern>/EagerModuel/*</url-pattern>
+	</filter-mapping>
+	<jsp-config>
+		<!-- <taglib>
+			<taglib-uri>/PopGrid-taglib</taglib-uri>
+			<taglib-location>taglib/pop-taglib.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>/Issue-taglib</taglib-uri>
+			<taglib-location>taglib/issue-taglib.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>/WEB-INF/CkfinderTag</taglib-uri>
+			<taglib-location>ckfinder.tld</taglib-location>
+		</taglib> -->
+	</jsp-config>
+
+	<welcome-file-list>
+		<welcome-file>login.jsp</welcome-file>
+	</welcome-file-list>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/common/error404.jsp</location>
+	</error-page>
+
+	<error-page>
+		<error-code>403</error-code>
+		<location>/common/error403.jsp</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/common/error500.jsp</location>
+	</error-page>
+
+	<servlet>
+		<servlet-name>JspSupportServlet</servlet-name>
+		<servlet-class>org.apache.struts2.views.JspSupportServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>freemarker</servlet-name>
+		<servlet-class>com.eager.core.freemarker.EagerFreemarkerServlet</servlet-class>
+		<!--下面的配置freemarke的ftl文件的位置 -->
+		<init-param>
+			<param-name>TemplatePath</param-name>
+			<param-value>class://template/</param-value>
+		</init-param>
+		<!-- 是否和服务器（tommcat)一起启动。0为不。1为是 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>freemarker</servlet-name>
+		<url-pattern>*.ftl</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="core.tysysper">
+
+	<resultMap id="tysysperMap" type="com.eager.core.domain.Tysysper">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="url" column="URL" />
+		<result property="parent.id" column="PARENTID" />
+		<result property="showtext" column="SHOWTEXT" />
+	</resultMap>
+	<resultMap id="simpletysysper" type="com.eager.core.domain.Tysysper">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="url" column="URL" />
+		<result property="showtext" column="SHOWTEXT" />
+	</resultMap>
+	<select id="findAllPermissions"  resultMap="tysysperMap">
+		select * from tysysper 
+	</select>
+	<select id="findPermissionsByTysysusrId"  resultMap="tysysperMap">
+		select * from tysysper where exist(select 1 from tysyspert where tysyspert.permid=tysysper.id and tysyspert.usergid=#{value} )
+	</select>
+	<select id="getPermissionsById"  resultMap="simpletysysper">
+		select * from tysysper where id=#{id} 
+	</select>
+	<select id="findTysysperByUrl"  resultMap="simpletysysper">
+		select * from tysysper where url=#{url} 
+	</select>
+	<insert id="addTysysper">
+		<selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+			select nextVal('tb_tysysper') as id
+		</selectKey>
+		insert into tysysper (id
+		,name
+		,parentid
+		,showtext
+		<if test="url!=null and url!=''">
+			,url
+		</if>
+		,createdate,createuser)
+		values
+		(#{id},#{name},#{parent.id},#{showtext}
+		<if test="url!=null and url!=''">
+			,#{url}
+		</if>
+		,current_timestamp(0)::timestamp without time zone
+		,#{createUser})
+	</insert>
+	
+</mapper> 
